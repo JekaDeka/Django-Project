@@ -2,6 +2,7 @@ from django.db import models
 from django.urls import reverse
 
 from .utils import transliterate
+from .utils import slugify
 
 
 class Displayable(models.Model):
@@ -37,15 +38,14 @@ class Slugged(models.Model):
     def generate_slug(self, title=None):
         if not title:
             title = self.title
-        # Мое новое кулинарное шоу => Moe_novoe_kulinarnoe_shoy
-        # 1. Попытаться получить существующую модель с таким slug
-        # 2. Если такого объекта нет, то все ок.
-        # => title => translit/remove whistespace => slug
-        # 3. Если объект с таким slug существует, то:
-        # => title + .... (random A-Z0-9) =>
-        # translit / remove whistespace => slug
-        slug = transliterate(title)
-        return slug
+
+        unique_slug = transliterate(title)
+        num = 1
+        while Slugged.objects.filter(slug=unique_slug).exists():
+            unique_slug = '{}-{}'.format(unique_slug, num)
+            num += 1       
+
+        return unique_slug
 
     def get_absolute_url(self):
         return reverse(
