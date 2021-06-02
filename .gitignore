@@ -1,7 +1,0 @@
-/.vscode
-/db.sqlite3
-/django.code-workspace
-/env
-**/migrations/*
-!**/migrations/__init__.py
-*.pyc
